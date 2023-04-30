@@ -1,14 +1,17 @@
 package com.example.lunchtray.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lunchtray.data.OrderUiState
 import com.example.lunchtray.model.MenuItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.text.NumberFormat
 
 class OrderViewModel : ViewModel() {
+
+    private val taxRate = 0.98
+
     private val _uiState = MutableStateFlow(OrderUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -19,27 +22,40 @@ class OrderViewModel : ViewModel() {
         _uiState.value = OrderUiState()
     }
 
-    fun setEntreeItem(entreeItem: MenuItem.EntreeItem) {
-        _uiState.update {
-            it.copy(
-                entreeItem = entreeItem
-            )
-        }
+    fun updateEntree(entree: MenuItem.EntreeItem) {
+        val previousEntree = _uiState.value.entreeItem
+        updateItem(entree, previousEntree)
     }
 
-    fun setSideDishItem(sideDishItem: MenuItem.SideDishItem) {
-        _uiState.update {
-            it.copy(
-                sideDishItem = sideDishItem
-            )
-        }
+    fun updateSideDish(sideDish: MenuItem.SideDishItem) {
+        val previousSideDish = _uiState.value.sideDishItem
+        updateItem(sideDish, previousSideDish)
     }
 
-    fun setAccompanimentItem(accompanimentItem: MenuItem.AccompanimentItem) {
-        _uiState.update {
-            it.copy(
-                accompanimentItem = accompanimentItem
+    fun updateAccompaniment(accompaniment: MenuItem.AccompanimentItem) {
+        val previousAccompaniment = _uiState.value.accompanimentItem
+        updateItem(accompaniment, previousAccompaniment)
+    }
+
+    private fun updateItem(newItem: MenuItem, previousItem: MenuItem?) {
+        _uiState.update { currentState ->
+            val previousItemPrice = previousItem?.price ?: 0.0
+            // subtract previous item price in case an item of this category was already added.
+            val itemTotalPrice = currentState.itemTotalPrice - previousItemPrice + newItem.price
+            // recalculate tax
+            val tax = itemTotalPrice * taxRate
+            currentState.copy(
+                itemTotalPrice = itemTotalPrice,
+                orderTax = tax,
+                orderTotalPrice = itemTotalPrice + tax,
+                entreeItem = if (newItem is MenuItem.EntreeItem) newItem else currentState.entreeItem,
+                sideDishItem = if (newItem is MenuItem.SideDishItem) newItem else currentState.sideDishItem,
+                accompanimentItem = if (newItem is MenuItem.AccompanimentItem) newItem else currentState.accompanimentItem
             )
         }
     }
+}
+
+fun Double.formatPrice(): String {
+    return NumberFormat.getCurrencyInstance().format(this)
 }

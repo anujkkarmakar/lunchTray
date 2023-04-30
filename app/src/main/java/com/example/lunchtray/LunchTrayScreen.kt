@@ -4,6 +4,7 @@
 
 package com.example.lunchtray
 
+import android.provider.ContactsContract.Data
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -27,7 +28,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.lunchtray.datasource.DataSource
+import com.example.lunchtray.model.MenuItem
+import com.example.lunchtray.ui.ItemOrderScreen
 import com.example.lunchtray.ui.OrderViewModel
+import com.example.lunchtray.ui.StartOrderScreen
 
 enum class LunchTrayScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
@@ -39,8 +44,11 @@ enum class LunchTrayScreen(@StringRes val title: Int) {
 
 /**
  * LunchTrayAppBar displays the top app bar of the app-
- * [canNavigateBack] determines if the backStack is empty or not,
- * [currentScreen] displays the name of the current activity in focus,
+ *
+ * [canNavigateBack] determines if the backStack is empty or not
+ *
+ * [currentScreen] displays the name of the current activity in focus
+ *
  * [navigateUp] is used to pop the non-empty back stack
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,16 +104,48 @@ fun LunchTrayApp(
             modifier = modifier.padding(it)
         ) {
             composable(route = LunchTrayScreen.Start.name) {
-
+                StartOrderScreen(
+                    navHostController = navHostController,
+                    onButtonClick = {
+                        navHostController.navigate(LunchTrayScreen.Entree.name)
+                    }
+                )
             }
             composable(route = LunchTrayScreen.Entree.name) {
-
+                ItemOrderScreen(
+                    onCancelClicked = { cancelOrderAndNavigateBackToStartScreen(viewModel, navHostController) },
+                    onNextClicked = {
+                        navHostController.navigate(LunchTrayScreen.SideDish.name)
+                    },
+                    list = DataSource.entreeMenuItems,
+                    onSelectionChanged = {
+                        viewModel.updateEntree(it as MenuItem.EntreeItem)
+                    }
+                )
             }
             composable(route = LunchTrayScreen.SideDish.name) {
-
+                ItemOrderScreen(
+                    onCancelClicked = { cancelOrderAndNavigateBackToStartScreen(viewModel, navHostController) },
+                    onNextClicked = {
+                        navHostController.navigate(LunchTrayScreen.Accompaniment.name)
+                    },
+                    list = DataSource.sideDishMenuItems,
+                    onSelectionChanged = {
+                        viewModel.updateSideDish(it as MenuItem.SideDishItem)
+                    }
+                )
             }
             composable(route = LunchTrayScreen.Accompaniment.name) {
-
+                ItemOrderScreen(
+                    onCancelClicked = { cancelOrderAndNavigateBackToStartScreen(viewModel, navHostController) },
+                    onNextClicked = {
+                        navHostController.navigate(LunchTrayScreen.Checkout.name)
+                    },
+                    list = DataSource.accompanimentMenuItems,
+                    onSelectionChanged = {
+                        viewModel.updateAccompaniment(it as MenuItem.AccompanimentItem)
+                    }
+                )
             }
             composable(route = LunchTrayScreen.Checkout.name) {
 

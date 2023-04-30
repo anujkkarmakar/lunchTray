@@ -19,7 +19,7 @@ import com.example.lunchtray.R
 @Composable
 fun StartOrderScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
+    navHostController: NavHostController = rememberNavController(),
     onButtonClick: () -> Unit = {}
 ) {
     Column(
