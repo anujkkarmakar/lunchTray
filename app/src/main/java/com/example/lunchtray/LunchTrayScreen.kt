@@ -4,7 +4,6 @@
 
 package com.example.lunchtray
 
-import android.provider.ContactsContract.Data
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -31,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lunchtray.datasource.DataSource
 import com.example.lunchtray.model.MenuItem
 import com.example.lunchtray.ui.ItemOrderScreen
+import com.example.lunchtray.ui.OrderSummaryScreen
 import com.example.lunchtray.ui.OrderViewModel
 import com.example.lunchtray.ui.StartOrderScreen
 
@@ -57,10 +57,10 @@ fun LunchTrayAppBar(
     modifier: Modifier = Modifier,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
-    currentScreen: LunchTrayScreen
+    currentScreen: Int
 ) {
     TopAppBar(
-        title = { Text(stringResource(id = currentScreen.title)) },
+        title = { Text(stringResource(id = currentScreen)) },
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
@@ -90,9 +90,9 @@ fun LunchTrayApp(
     Scaffold(
         topBar = {
             LunchTrayAppBar(
-                canNavigateBack = true,
-                navigateUp = { /*TODO*/ },
-                currentScreen = LunchTrayScreen.Start
+                currentScreen = currentScreen.title,
+                canNavigateBack = navHostController.previousBackStackEntry != null,
+                navigateUp = { navHostController.navigateUp() }
             )
         }
     ) {
@@ -148,7 +148,9 @@ fun LunchTrayApp(
                 )
             }
             composable(route = LunchTrayScreen.Checkout.name) {
+                OrderSummaryScreen(orderUiState = uiState, onCancelClicked = { cancelOrderAndNavigateBackToStartScreen(viewModel, navHostController) }) {
 
+                }
             }
         }
 
@@ -172,6 +174,6 @@ fun LunchTrayAppBarPreview() {
     LunchTrayAppBar(
         canNavigateBack = false,
         navigateUp = {},
-        currentScreen = LunchTrayScreen.Start
+        currentScreen = LunchTrayScreen.Start.title
     )
 }
