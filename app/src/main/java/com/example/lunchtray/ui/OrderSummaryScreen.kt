@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lunchtray.R
 import com.example.lunchtray.data.OrderUiState
+import com.example.lunchtray.datasource.DataSource
 
 @Composable
 fun OrderSummaryScreen(
@@ -100,7 +102,8 @@ fun DisplayPriceDetails(
     name: String,
     price: String
 ) {
-    Row(horizontalArrangement = Arrangement.End) {
+    Row() {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = name,
             style = if (name == "Total") MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelSmall
@@ -110,4 +113,21 @@ fun DisplayPriceDetails(
             style = if (name == "Total") MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelSmall
         )
     }
+}
+
+@Preview
+@Composable
+fun CheckoutScreenPreview() {
+    OrderSummaryScreen(
+        orderUiState = OrderUiState(
+            entreeItem = DataSource.entreeMenuItems[0],
+            sideDishItem = DataSource.sideDishMenuItems[0],
+            accompanimentItem = DataSource.accompanimentMenuItems[0],
+            itemTotalPrice = 15.00,
+            orderTax = 1.00,
+            orderTotalPrice = 16.00
+        ),
+        onNextClicked = {},
+        onCancelClicked = {}
+    )
 }
