@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lunchtray.R
@@ -29,16 +32,32 @@ fun OrderSummaryScreen(
     onCancelClicked: () -> Unit,
     onNextClicked: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text(
             text = stringResource(id = R.string.order_summary),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
         )
         //1.
         orderUiState.apply {
 
-            entreeItem?.let { DisplayItemDetails(name = entreeItem.name, price = it.getFormattedPrice()) }
-            sideDishItem?.let { DisplayItemDetails(name = sideDishItem.name, price = it.getFormattedPrice()) }
+            entreeItem?.let {
+                DisplayItemDetails(
+                    name = entreeItem.name,
+                    price = it.getFormattedPrice()
+                )
+            }
+            sideDishItem?.let {
+                DisplayItemDetails(
+                    name = sideDishItem.name,
+                    price = it.getFormattedPrice()
+                )
+            }
             accompanimentItem?.let {
                 DisplayItemDetails(
                     name = it.name,
@@ -58,10 +77,11 @@ fun OrderSummaryScreen(
             )
             DisplayPriceDetails(
                 name = stringResource(id = R.string.total),
-                price = orderTotalPrice.formatPrice()
+                price = orderTotalPrice.formatPrice(),
+                fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         //3.
         Row(
             modifier = Modifier
@@ -100,22 +120,23 @@ fun DisplayItemDetails(
 @Composable
 fun DisplayPriceDetails(
     name: String,
-    price: String
+    price: String,
+    fontWeight: FontWeight = FontWeight.Normal
 ) {
     Row() {
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = name,
-            style = if (name == "Total") MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelSmall
+            fontWeight = fontWeight
         )
         Text(
             text = price,
-            style = if (name == "Total") MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelSmall
+            fontWeight = fontWeight
         )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun CheckoutScreenPreview() {
     OrderSummaryScreen(
